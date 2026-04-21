@@ -1,0 +1,216 @@
+/* ═══════════════════════════════════════════════════════════════════
+   STRUCTURAL GRID SYSTEM v1.1
+   Modular, token-driven, responsive grid for any layout.
+
+   Philosophy
+   ──────────
+   1. Single source of truth — all spatial values live in CSS custom
+      properties on :root. Never hardcode a gap, pad, or margin in a
+      component.
+   2. Two primitives only — .g-row (horizontal section bound to the
+      column track) and .g-cell (placed item with optional uniform
+      inset).
+   3. Decoration is separable — the visible column overlay is an
+      optional .g-overlay layer that toggles on/off without changing
+      layout behavior.
+   4. Responsive through tokens — change --g-cols / --g-gap / --g-pad
+      at breakpoints, not per-component grid-column values.
+   5. Inset = outer pad (default) — content is the same distance from
+      every grid line, vertical or horizontal. That symmetry is the
+      geometric contract of the system.
+   6. Dividers are viewport-wide — .g-row::after paints 100vw - --g-sb
+      so all horizontal lines (row dividers, cell-top dividers) align.
+   7. Dark surfaces re-tint tokens — .g-section--dark does every line
+      at once; no per-component dark overrides.
+
+   See SKILL.md for the full reference.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── Tokens ─────────────────────────────────────────────────────── */
+:root {
+  --g-cols: 12;                          /* column count */
+  --g-gap: 24px;                         /* gutter */
+  --g-pad: 32px;                         /* outer page padding */
+  --g-max: 1200px;                       /* content max-width */
+  /* Uniform 4-side inset inside each cell. Defaulting to --g-pad keeps
+     content the same distance from every grid line (vertical or
+     horizontal). Override per-row with `style="--g-inset: 0"` for
+     edge-to-edge elements (wordmarks, marquees, media). */
+  --g-inset: var(--g-pad);
+  --g-line: rgba(40, 40, 40, 0.14);      /* outer / prominent vertical line */
+  --g-line-soft: transparent;            /* inner verticals (hidden by default) */
+  --g-divider: rgba(40, 40, 40, 0.14);   /* horizontal row divider */
+  --g-row-min: 0;                        /* optional min row height */
+  /* --g-sb is set by the inline head script (see SKILL.md §1b). It is
+     the reserved scrollbar-gutter width, used so 100vw dividers don't
+     shift left when the scrollbar appears. Falls back to 0px when the
+     script hasn't run (SSR first paint). */
+}
+
+/* Required for grid alignment.
+   - scrollbar-gutter: stable → fixed --g-sb, so 100vw dividers stay
+     aligned with content when the scrollbar appears.
+   - overflow-x: clip → 100vw dividers don't trigger an H-scroll bar. */
+html {
+  scrollbar-gutter: stable;
+  overflow-x: clip;
+}
+/* Async layout shifts (video metadata, images) won't jiggle the viewport
+   via the browser's scroll-anchoring heuristic. */
+body { overflow-anchor: none; }
+
+/* ─── Row ────────────────────────────────────────────────────────── */
+.g-row {
+  width: 100%;
+  max-width: calc(var(--g-max) + var(--g-pad) * 2);
+  margin-inline: auto;
+  padding-inline: var(--g-pad);
+  display: grid;
+  grid-template-columns: repeat(var(--g-cols), minmax(0, 1fr));
+  gap: var(--g-gap);
+  align-items: stretch;
+  min-height: var(--g-row-min);
+  position: relative;            /* anchors ::after divider */
+  z-index: 1;
+}
+
+/* Full-bleed horizontal divider.
+   Width matches the visible viewport (excluding reserved scrollbar
+   gutter), so row dividers and cell-level dividers line up regardless
+   of where they're anchored. Kill with .g-row--no-divider. */
+.g-row::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -1px;
+  width: calc(100vw - var(--g-sb, 0px));
+  height: 1px;
+  transform: translateX(-50%);
+  background: var(--g-divider);
+  pointer-events: none;
+}
+
+/* Row modifiers */
+.g-row--center     { align-items: center; }
+.g-row--start      { align-items: start; }
+.g-row--end        { align-items: end; }
+.g-row--no-divider::after { content: none; }
+.g-row--tight      { --g-inset: 0; }
+
+/* ─── Cell ───────────────────────────────────────────────────────── */
+.g-cell {
+  grid-column: var(--g-col, auto);
+  padding: var(--g-inset);
+  min-width: 0;                         /* prevents grid overflow from long words */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.g-cell > * { max-width: 100%; }
+
+/* ─── Semantic span aliases ──────────────────────────────────────── */
+/* Prefer these over raw grid-column values. They reflow automatically
+   when --g-cols changes at breakpoints. */
+.g-full     { --g-col: 1 / -1; }
+.g-half-l   { --g-col: 1 / span calc(var(--g-cols) / 2); }
+.g-half-r   { --g-col: span calc(var(--g-cols) / 2) / -1; }
+.g-third-l  { --g-col: 1 / span calc(var(--g-cols) / 3); }
+.g-third-m  { --g-col: span calc(var(--g-cols) / 3) / span calc(var(--g-cols) / 3); }
+.g-third-r  { --g-col: span calc(var(--g-cols) / 3) / -1; }
+
+/* Centered-N: e.g. g-mid-2 in a 4-col grid centers across cols 2–3.
+   Use for even column counts; gracefully clamps at narrow widths. */
+.g-mid-2 { --g-col: calc((var(--g-cols) - 2) / 2 + 1) / span 2; }
+.g-mid-4 { --g-col: calc((var(--g-cols) - 4) / 2 + 1) / span 4; }
+.g-mid-6 { --g-col: calc((var(--g-cols) - 6) / 2 + 1) / span 6; }
+.g-mid-8 { --g-col: calc((var(--g-cols) - 8) / 2 + 1) / span 8; }
+
+/* Span-N (not position-locked; wraps naturally on small screens).
+   Use these for "3-column" sections that should stack on mobile. */
+.g-span-1  { --g-col: span 1; }
+.g-span-2  { --g-col: span 2; }
+.g-span-3  { --g-col: span 3; }
+.g-span-4  { --g-col: span 4; }
+.g-span-5  { --g-col: span 5; }
+.g-span-6  { --g-col: span 6; }
+.g-span-7  { --g-col: span 7; }
+.g-span-8  { --g-col: span 8; }
+.g-span-9  { --g-col: span 9; }
+.g-span-10 { --g-col: span 10; }
+.g-span-11 { --g-col: span 11; }
+.g-span-12 { --g-col: span 12; }
+
+/* ─── Overlay (optional decoration) ──────────────────────────────── */
+.g-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+}
+/* Scoped variant: anchor the overlay to a positioned ancestor instead
+   of the viewport. Use inside a section that has position: relative.
+   Required when the page has any fixed-behind content at z-index: 0
+   that would conflict with a global fixed overlay. */
+.g-overlay--local { position: absolute; }
+
+.g-overlay__inner {
+  width: 100%;
+  max-width: calc(var(--g-max) + var(--g-pad) * 2);
+  padding-inline: var(--g-pad);
+  display: grid;
+  grid-template-columns: repeat(var(--g-cols), minmax(0, 1fr));
+  gap: var(--g-gap);
+  height: 100%;
+}
+.g-overlay__col { border-inline: 1px solid var(--g-line-soft); }
+.g-overlay__col:first-child { border-inline-start-color: var(--g-line); }
+.g-overlay__col:last-child  { border-inline-end-color:   var(--g-line); }
+
+/* Global toggles — apply on <body> to kill decoration site-wide */
+.g-no-overlay .g-overlay,
+.g-no-overlay .g-overlay--local { display: none; }
+.g-no-dividers .g-row::after { content: none; }
+
+/* ─── Dark-surface variant ───────────────────────────────────────── */
+/* One class re-tints every grid line so dark sections (CTA, footer)
+   pick up appropriately bright lines. Applied on the section element;
+   every row, cell, and overlay inside inherits via custom-property
+   cascade. Dark surfaces need more alpha (~0.08) than light (~0.14)
+   for equivalent perceived contrast. */
+.g-section--dark {
+  --g-line:      rgba(255, 255, 255, 0.08);
+  --g-line-soft: transparent;
+  --g-divider:   rgba(255, 255, 255, 0.08);
+}
+
+/* ─── Responsive — only the tokens change ────────────────────────── */
+@media (max-width: 1200px) { :root { --g-cols: 12; } }
+@media (max-width: 1024px) { :root { --g-cols: 8; } }
+@media (max-width: 768px)  { :root { --g-cols: 4; --g-pad: 24px; } }
+@media (max-width: 480px)  { :root { --g-cols: 2; --g-pad: 16px; --g-gap: 12px; } }
+
+/* ─── Mobile helpers ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Force a cell to span the full row on mobile. Prefer .g-full when a
+     cell should always be full-width regardless of breakpoint. */
+  .g-sm-full { --g-col: 1 / -1; }
+
+  /* Paint a horizontal divider above a cell — used when multi-column
+     rows stack vertically on mobile, so each stacked cell reads as its
+     own "row" with a grid-aligned separator. Geometry matches
+     .g-row::after so lines align across the page. */
+  .g-sm-hr-top { position: relative; }
+  .g-sm-hr-top::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    width: calc(100vw - var(--g-sb, 0px));
+    height: 1px;
+    transform: translateX(-50%);
+    background: var(--g-divider);
+    pointer-events: none;
+  }
+}

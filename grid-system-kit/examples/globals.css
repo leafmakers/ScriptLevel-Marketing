@@ -1,0 +1,545 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-plus-jakarta), system-ui, sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  /* Prevent layout shifts (e.g. async video metadata loading) from
+     nudging the viewport via browser scroll anchoring. */
+  overflow-anchor: none;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+  /* Required by structural-grid — fixed overlays live in viewport coords;
+     reserving scrollbar space prevents content shift when it appears. */
+  scrollbar-gutter: stable;
+  /* Clip horizontally so full-bleed (100vw) pseudo dividers don't trigger
+     a horizontal scrollbar. Without this, the browser treats the 100vw
+     line as overflow and may visually trim it. */
+  overflow-x: clip;
+}
+
+/* =============================================================
+   Structural Grid System v1.0
+   - Tokens drive everything (--g-cols, --g-gap, --g-pad, --g-max)
+   - Two primitives: .g-row (column track) + .g-cell (placed item)
+   - Decoration is separable (.g-overlay)
+   - Responsive via token overrides, not per-component media queries
+   ============================================================= */
+:root {
+  --g-cols: 12;
+  --g-gap: 24px;
+  --g-pad: 32px;
+  --g-max: 1200px;
+  /* Uniform 4-side inset matches outer padding, so distance from any grid
+     line (vertical or horizontal) to content is the same. Scales with
+     --g-pad at breakpoints automatically. Override per-row if needed. */
+  --g-inset: var(--g-pad);
+  /* Light bg preset (Step 7b) — only outer verticals + horizontal dividers
+     are visible for now; inner verticals hidden via transparent. */
+  --g-line: rgba(40, 40, 40, 0.14);
+  --g-line-soft: transparent;
+  --g-divider: rgba(40, 40, 40, 0.14);
+  --g-row-min: 0;
+}
+
+.g-row {
+  width: 100%;
+  max-width: calc(var(--g-max) + var(--g-pad) * 2);
+  margin-inline: auto;
+  padding-inline: var(--g-pad);
+  display: grid;
+  grid-template-columns: repeat(var(--g-cols), minmax(0, 1fr));
+  gap: var(--g-gap);
+  align-items: stretch;
+  min-height: var(--g-row-min);
+  position: relative;
+  z-index: 1;
+}
+/* Horizontal divider as a pseudo that extends full viewport width,
+   ignoring the row's max-width. Kill with .g-row--no-divider. */
+.g-row::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -1px;
+  /* Width matches the visible viewport (excluding any reserved scrollbar
+     gutter) so the line spans the same area regardless of which element
+     it's anchored to — keeps row dividers and cell-level dividers
+     perfectly co-aligned. */
+  width: calc(100vw - var(--g-sb, 0px));
+  height: 1px;
+  transform: translateX(-50%);
+  background: var(--g-divider);
+  pointer-events: none;
+}
+.g-row--no-divider::after { content: none; }
+
+.g-row--center { align-items: center; }
+.g-row--start  { align-items: start; }
+.g-row--end    { align-items: end; }
+.g-row--tight  { --g-inset: 0; }
+
+.g-cell {
+  grid-column: var(--g-col, auto);
+  padding: var(--g-inset);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.g-cell > * { max-width: 100%; }
+
+/* Semantic spans — reflow with --g-cols */
+.g-full    { --g-col: 1 / -1; }
+.g-half-l  { --g-col: 1 / span calc(var(--g-cols) / 2); }
+.g-half-r  { --g-col: span calc(var(--g-cols) / 2) / -1; }
+.g-third-l { --g-col: 1 / span calc(var(--g-cols) / 3); }
+.g-third-m { --g-col: span calc(var(--g-cols) / 3) / span calc(var(--g-cols) / 3); }
+.g-third-r { --g-col: span calc(var(--g-cols) / 3) / -1; }
+
+.g-mid-2 { --g-col: calc((var(--g-cols) - 2) / 2 + 1) / span 2; }
+.g-mid-4 { --g-col: calc((var(--g-cols) - 4) / 2 + 1) / span 4; }
+.g-mid-6 { --g-col: calc((var(--g-cols) - 6) / 2 + 1) / span 6; }
+.g-mid-8 { --g-col: calc((var(--g-cols) - 8) / 2 + 1) / span 8; }
+
+.g-span-1  { --g-col: span 1; }
+.g-span-2  { --g-col: span 2; }
+.g-span-3  { --g-col: span 3; }
+.g-span-4  { --g-col: span 4; }
+.g-span-5  { --g-col: span 5; }
+.g-span-6  { --g-col: span 6; }
+.g-span-8  { --g-col: span 8; }
+.g-span-12 { --g-col: span 12; }
+
+/* Visible grid-line overlay (decoration, separable).
+   Per-section via .g-overlay--local — we intentionally do NOT use a
+   site-wide fixed overlay because the fixed Rendering Modes section
+   sits at z:0 and would conflict. */
+.g-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+}
+.g-overlay--local { position: absolute; }
+
+.g-overlay__inner {
+  width: 100%;
+  max-width: calc(var(--g-max) + var(--g-pad) * 2);
+  padding-inline: var(--g-pad);
+  display: grid;
+  grid-template-columns: repeat(var(--g-cols), minmax(0, 1fr));
+  gap: var(--g-gap);
+  height: 100%;
+}
+.g-overlay__col { border-inline: 1px solid var(--g-line-soft); }
+.g-overlay__col:first-child { border-inline-start-color: var(--g-line); }
+.g-overlay__col:last-child  { border-inline-end-color: var(--g-line); }
+
+.g-no-overlay .g-overlay, .g-no-overlay .g-overlay--local { display: none; }
+.g-no-dividers .g-row { border-bottom: none; }
+
+/* Section modifier — re-tints all grid tokens for dark surfaces so
+   both the overlay lines AND any row dividers stay readable. Dark
+   backgrounds need a bit more alpha than light for equivalent contrast.
+   Inner verticals hidden to match the light preset. */
+.g-section--dark {
+  --g-line: rgba(255, 255, 255, 0.08);
+  --g-line-soft: transparent;
+  --g-divider: rgba(255, 255, 255, 0.08);
+}
+
+/* Responsive: only the tokens change — cells reflow automatically */
+@media (max-width: 1200px) { :root { --g-cols: 12; } }
+@media (max-width: 1024px) { :root { --g-cols: 8; } }
+@media (max-width: 768px)  { :root { --g-cols: 4; --g-pad: 24px; } }
+@media (max-width: 480px)  { :root { --g-cols: 2; --g-pad: 16px; --g-gap: 12px; } }
+
+/* Opt-in helper: forces a cell to span the full row at mobile widths,
+   so it wraps beneath its siblings without leaving a dangling empty
+   column. Use sparingly — prefer .g-full when a cell should always be
+   full-width. */
+@media (max-width: 768px) {
+  .g-sm-full { --g-col: 1 / -1; }
+  /* Footer: when Product + Connect wrap to their own rows on mobile,
+     pull them closer together vertically. */
+  .footer-main-row { row-gap: 16px; }
+
+  /* Horizontal divider above the cell, extending the full viewport
+     width (matches the row-divider pattern). Mobile only, where cells
+     stack vertically. */
+  .g-sm-hr-top {
+    position: relative;
+  }
+  .g-sm-hr-top::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    /* Match .g-row::after exactly — width is the visible viewport
+       (excluding reserved scrollbar gutter) so cell-level dividers
+       align with row-level dividers regardless of cell offset. */
+    width: calc(100vw - var(--g-sb, 0px));
+    height: 1px;
+    transform: translateX(-50%);
+    background: var(--g-divider);
+    pointer-events: none;
+  }
+}
+
+/* Subtle animations */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.6s ease-out forwards;
+}
+
+/* Selection color */
+::selection {
+  background-color: #e5e5e5;
+  color: #0a0a0a;
+}
+
+/* Noise grain texture overlay for tactile cards */
+.card-grain {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-grain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.45;
+  mix-blend-mode: multiply;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='a' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)'/%3E%3C/svg%3E");
+  background-size: 180px;
+}
+
+.card-grain > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Card hover effects - desktop only */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+@media (min-width: 768px) {
+  .card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* 3D Cube rotation animation */
+@keyframes rotateCube {
+  0% {
+    transform: rotateX(-20deg) rotateY(0deg);
+  }
+  100% {
+    transform: rotateX(-20deg) rotateY(360deg);
+  }
+}
+
+/* Scroll-triggered slide-in from right animation */
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in-right {
+  opacity: 0;
+  animation: fade-in-up 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@media (min-width: 768px) {
+  .animate-slide-in-right {
+    animation: slide-in-right 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+}
+
+/* Easter egg: card falls with natural gravity.
+   Uses CSS vars so each card preserves its resting rotation/scale and
+   gets a unique drift + spin during the fall. */
+@keyframes card-fall {
+  0% {
+    transform:
+      translate(0, 0)
+      rotate(var(--card-rest-rotate, 0deg))
+      scale(var(--card-rest-scale, 1));
+    opacity: 1;
+  }
+  14% {
+    /* Anticipation — slight lift before the drop */
+    transform:
+      translate(0, -10px)
+      rotate(calc(var(--card-rest-rotate, 0deg) + var(--card-tilt, 0deg) * 0.15))
+      scale(var(--card-rest-scale, 1));
+    opacity: 1;
+  }
+  100% {
+    transform:
+      translate(var(--card-drift, 0px), 130vh)
+      rotate(calc(var(--card-rest-rotate, 0deg) + var(--card-tilt, 8deg)))
+      scale(var(--card-rest-scale, 1));
+    opacity: 1;
+  }
+}
+
+.animate-card-fall {
+  animation: card-fall 0.6s cubic-bezier(0.55, 0.05, 0.85, 0.4) forwards;
+  pointer-events: none;
+}
+
+/* Easter egg: cards swish back in */
+@keyframes swish-in {
+  0% {
+    opacity: 0;
+    transform: translateY(200px) rotate(20deg) scale(0.7);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-8px) rotate(-2deg) scale(1.02);
+  }
+  80% {
+    transform: translateY(3px) rotate(0.5deg) scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+}
+
+.animate-swish-in {
+  animation: swish-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-spin-slow {
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes scroll-modes {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+.animate-scroll-modes {
+  animation: scroll-modes 8s linear infinite;
+}
+
+@keyframes marquee-x {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.footer-marquee {
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+          mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+
+.footer-marquee__track {
+  display: inline-flex;
+  animation: marquee-x 40s linear infinite;
+  will-change: transform;
+}
+
+.footer-marquee__track > span {
+  padding-right: 0.375rem;
+  flex-shrink: 0;
+}
+
+.footer-marquee__track b {
+  font-weight: 600;
+  color: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Neon-sign flicker: letter oscillates between dark (dim) red and a
+   bright red "lit" pulse, then settles on the dark red at the end.
+   The dim state keeps a subtle brighter-red stroke visible so the
+   resting wordmark reads as outlined in a slightly lighter tint —
+   same red family, brighter edge. steps(1, end) on each segment gives
+   instant jumps with no crossfade, reading as electrical flicker. */
+/* Irregular flicker pattern — non-uniform gaps between flashes and a
+   few lit-in-a-row beats, so it reads as electrical noise rather than
+   an even on/off metronome. Stroke colour stays in the fill's family
+   (a hair brighter #a52222 at rest, warmer #c44040 when lit) so the
+   outline is subtle rather than a halo. */
+@keyframes wordmark-flicker {
+  0%   { fill: #8b1a1a; stroke: #b52e2e; }
+  40%  { fill: #8b1a1a; stroke: #b52e2e; }
+  42%  { fill: #b52828; stroke: #c23838; }
+  45%  { fill: #8b1a1a; stroke: #b52e2e; }
+  58%  { fill: #8b1a1a; stroke: #b52e2e; }
+  60%  { fill: #b52828; stroke: #c23838; }
+  61%  { fill: #8b1a1a; stroke: #b52e2e; }
+  63%  { fill: #b52828; stroke: #c23838; }
+  67%  { fill: #8b1a1a; stroke: #b52e2e; }
+  79%  { fill: #8b1a1a; stroke: #b52e2e; }
+  81%  { fill: #b52828; stroke: #c23838; }
+  83%  { fill: #8b1a1a; stroke: #b52e2e; }
+  100% { fill: #8b1a1a; stroke: #b52e2e; }
+}
+
+/* .wordmark-flicker is just a marker class — the component splits the
+   text into per-char <tspan>s when this class is present, and each
+   tspan carries its own inline animation with a randomized delay and
+   duration so letters flicker independently instead of in lockstep. */
+
+/* Envelope effect — HIW starts translated up to sit glued to the hero's
+   bottom edge (covering the 100vh spacer), then slides down to its
+   natural flow position as the user scrolls, opening a gap through
+   which the fixed Rendering Modes section is revealed. Pure CSS via
+   scroll-timeline: no JS scroll listener, GPU-composited transform,
+   immune to Lenis / mobile URL-bar resizes. Browsers without support
+   fall back to the static natural layout (envelope starts open). */
+/* Envelope effect — the transform is driven by the scroll listener
+   in page.tsx (hooked into Lenis's scroll tick when available, else
+   to the native scroll event). The static transform below is the
+   SSR/first-paint state: HIW glued to hero bottom so the envelope is
+   already closed before JS runs. JS overrides via inline style once
+   mounted. will-change keeps HIW on its own compositor layer so
+   transform updates don't trigger repaints of siblings. */
+.hiw-envelope {
+  will-change: transform;
+  transform: translate3d(0, calc(var(--vh, 100vh) * -2.5), 0);
+}
+
+/* Applied by JS only while HIW is in the visible Phase-A range
+   (scrollY < phaseAEnd). A short CSS transition with an overshoot
+   curve gives each scroll tick a bit of dampening + snap-together
+   feel as HIW approaches the hero bottom on scroll-up. Outside
+   Phase A, the class is removed so the parked Phase-B writes don't
+   trail behind scroll and HIW re-enters naturally in Phase C. */
+.hiw-envelope.is-snapping {
+  transition: transform 180ms cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+/* Mobile: native touch momentum drives the scroll, and the rAF loop
+   writes a fresh transform every frame. Any CSS transition on top
+   gets interrupted on each scroll tick, causing a visible stutter.
+   Drop the transition entirely — rAF per-frame writes ARE the smoothing. */
+@media (max-width: 767px) {
+  .hiw-envelope.is-snapping {
+    transition: none;
+  }
+}
+
+/* Hero scroll-indicator dash: gentle vertical breathing */
+@keyframes hero-dash {
+  0%, 100% { transform: translateY(0); opacity: 0.55; }
+  50%      { transform: translateY(4px); opacity: 1; }
+}
+
+.animate-hero-dash {
+  animation: hero-dash 1.8s ease-in-out infinite;
+}
+
+
+/* Staggered delays for natural feel */
+.animate-delay-1 { animation-delay: 0.1s; }
+.animate-delay-2 { animation-delay: 0.2s; }
+.animate-delay-3 { animation-delay: 0.35s; }
+
+/* Hide scrollbar for horizontal scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
+/* Hide ALL default video controls and play buttons on mobile browsers */
+video::-webkit-media-controls,
+video::-webkit-media-controls-enclosure,
+video::-webkit-media-controls-panel,
+video::-webkit-media-controls-play-button,
+video::-webkit-media-controls-start-playback-button,
+video::-webkit-media-controls-overlay-play-button,
+video::-webkit-media-controls-current-time-display,
+video::-webkit-media-controls-time-remaining-display,
+video::-webkit-media-controls-timeline,
+video::-webkit-media-controls-volume-slider {
+  display: none !important;
+  -webkit-appearance: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+video::-moz-media-controls {
+  display: none !important;
+}
+
+video {
+  -webkit-media-controls-overlay-play-button: none;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out forwards;
+}
+

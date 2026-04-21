@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Structural Grid v1.1 — Demo</title>
+
+<!-- Inline script sets --g-sb (scrollbar-gutter width) and --vh (cached
+     innerHeight) BEFORE paint. Must be in <head>, not a deferred module. -->
+<script>
+  (function () {
+    var r = document.documentElement;
+    var sb = function () {
+      r.style.setProperty('--g-sb', (window.innerWidth - r.clientWidth) + 'px');
+    };
+    sb();
+    window.addEventListener('resize', sb);
+    r.style.setProperty('--vh', window.innerHeight + 'px');
+    window.addEventListener('orientationchange', function () {
+      r.style.setProperty('--vh', window.innerHeight + 'px');
+    });
+  })();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="grid-system.css" />
+
+<style>
+  /* ─── Page-local design tokens (NOT grid tokens) ────────────────── */
+  :root {
+    --bg: #f8f7f4;
+    --text: #0a0a0a;
+    --text-soft: #6b6b6b;
+    --text-mute: #a0a0a0;
+    --surface: #ffffff;
+    --stroke: rgba(40, 40, 40, 0.1);
+    --dark: #15151a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  /* ─── Type scale ────────────────────────────────────────────────── */
+  .eyebrow {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--text-mute);
+    font-weight: 600;
+  }
+  .headline {
+    font-weight: 800;
+    font-size: clamp(40px, 6vw, 72px);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+  }
+  .section-title {
+    font-weight: 700;
+    font-size: clamp(28px, 4vw, 44px);
+    letter-spacing: -0.02em;
+  }
+  .sub {
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--text-soft);
+    max-width: 56ch;
+  }
+  .lowercase { text-transform: lowercase; }
+
+  /* ─── Buttons ───────────────────────────────────────────────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 9999px;
+    font-weight: 700;
+    font-size: 13px;
+    text-decoration: none;
+    white-space: nowrap;
+    border: 1px solid var(--stroke);
+    transition: transform 0.15s ease;
+  }
+  .btn:hover { transform: scale(1.04); }
+  .btn--ghost { color: var(--text); background: transparent; }
+  .btn--primary {
+    color: #f5f4f0;
+    background: linear-gradient(180deg, #3a3a3a 0%, #1f1f1f 100%);
+    border-color: rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
+  }
+  .btn--white {
+    color: #0a0a0a;
+    background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12), inset 0 -1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  /* ─── Nav ───────────────────────────────────────────────────────── */
+  .site-nav-wrap {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(248, 247, 244, 0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--stroke);
+  }
+  .site-nav { position: relative; }
+  .nav-brand { display: inline-flex; align-items: center; gap: 8px;
+    font-weight: 800; letter-spacing: -0.04em; font-size: 18px;
+    color: var(--text); text-decoration: none; }
+  .nav-brand::before { content: '◆'; color: var(--text-mute); font-size: 14px; }
+  .nav-actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+
+  /* ─── Hero ──────────────────────────────────────────────────────── */
+  .hero { padding: 80px 0 120px; }
+  .hero .g-row { min-height: 480px; }
+
+  /* ─── Stats ─────────────────────────────────────────────────────── */
+  .stats .g-row { --g-inset: 28px; }
+  .stat-num {
+    font-weight: 800; font-size: 40px;
+    letter-spacing: -0.02em;
+  }
+  .stat-label { font-size: 13px; color: var(--text-soft); margin-top: 4px; }
+
+  /* ─── Features ──────────────────────────────────────────────────── */
+  .feature-num {
+    font-weight: 800; font-size: 40px;
+    color: #e5e5e5; line-height: 1; margin-bottom: 12px;
+    letter-spacing: -0.02em;
+  }
+  .feature-title {
+    font-weight: 700; font-size: 20px; margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  .feature-body { font-size: 14px; line-height: 1.55; color: var(--text-soft); }
+  .feature-visual {
+    margin-top: 20px;
+    aspect-ratio: 4/3;
+    background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
+    border: 1px solid var(--stroke);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-mute); font-size: 12px;
+  }
+
+  /* ─── Dark CTA ──────────────────────────────────────────────────── */
+  .cta-section {
+    position: relative;
+    background: var(--dark);
+    padding: 100px 0;
+    color: white;
+  }
+  .cta-card {
+    max-width: 420px; margin: 0 auto;
+    padding: 40px 28px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.02);
+    text-align: center;
+  }
+  .cta-card h2 { font-size: 28px; font-weight: 700; margin-bottom: 20px;
+    letter-spacing: -0.02em; }
+
+  /* ─── Footer ────────────────────────────────────────────────────── */
+  .site-footer { position: relative; background: var(--dark); color: white; }
+  .site-footer h3 { font-size: 11px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: rgba(255, 255, 255, 0.45);
+    margin-bottom: 12px; font-weight: 700; }
+  .site-footer ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .site-footer a { color: rgba(255, 255, 255, 0.6); text-decoration: none;
+    font-size: 14px; transition: color 0.15s; }
+  .site-footer a:hover { color: white; }
+  .footer-brand { max-width: 360px; color: rgba(255, 255, 255, 0.5); font-size: 14px;
+    line-height: 1.5; }
+  .footer-wordmark {
+    font-weight: 800; font-size: clamp(80px, 18vw, 240px);
+    color: #8b1a1a; -webkit-text-stroke: 2px #a52222;
+    letter-spacing: -0.04em;
+    line-height: 0.85;
+  }
+  .footer-marquee {
+    padding: 12px 0;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+    color: #8b1a1a;
+    text-transform: uppercase;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .footer-marquee__inner { white-space: nowrap; opacity: 0.7; }
+  .footer-marquee__inner span { margin-right: 32px; }
+
+  /* ─── Page-local responsive tweaks (NOT grid overrides) ─────────── */
+  @media (max-width: 768px) {
+    .nav-brand::before { content: '◆'; }
+    .hero { padding: 56px 0 80px; }
+    .hero .g-row { min-height: 360px; }
+  }
+</style>
+</head>
+<body>
+
+<!--
+  ═══════════════════════════════════════════════════════════════════
+  NAV BAR
+  - position: relative; → anchors .g-overlay--local
+  - --g-row-min: 64px   → fixed nav height
+  - --g-inset: 16px     → tighter vertical padding than default 32px
+  ═══════════════════════════════════════════════════════════════════
+-->
+<header class="site-nav-wrap">
+  <nav class="site-nav">
+    <div class="g-overlay g-overlay--local" aria-hidden="true">
+      <div class="g-overlay__inner" data-overlay></div>
+    </div>
+    <div
+      class="g-row g-row--center g-row--no-divider"
+      style="--g-row-min: 64px; --g-inset: 16px; position: relative; z-index: 2;"
+    >
+      <div class="g-cell g-half-l">
+        <a href="#" class="nav-brand">taskflow</a>
+      </div>
+      <div class="g-cell g-half-r">
+        <div class="nav-actions">
+          <a href="#" class="btn btn--ghost">Log in</a>
+          <a href="#" class="btn btn--primary">Get started →</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<!--
+  ═══════════════════════════════════════════════════════════════════
+  HERO — single full-width cell, centered
+  - g-row--no-divider  → no bottom line (hero stands alone)
+  - g-cell g-full      → spans the whole track at every breakpoint
+  ═══════════════════════════════════════════════════════════════════
+-->
+<section class="hero" style="position: relative;">
+  <div class="g-overlay g-overlay--local" aria-hidden="true">
+    <div class="g-overlay__inner" data-overlay></div>
+  </div>
+
+  <div class="g-row g-row--center g-row--no-divider" style="position: relative; z-index: 2;">
+    <div class="g-cell g-full" style="text-align: center;">
+      <p class="eyebrow" style="margin-bottom: 24px;">The structural grid, v1.1</p>
+      <h1 class="headline lowercase" style="margin-bottom: 28px;">
+        clarity in layout,<br>not just in code.
+      </h1>
+      <p class="sub" style="margin: 0 auto 40px; text-align: center;">
+        A modular, token-driven grid system that carries alignment across navbars,
+        sections, dark surfaces, and footers — without per-component media queries.
+      </p>
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <a href="#" class="btn btn--primary">Read the docs →</a>
+        <a href="#" class="btn btn--ghost">View source</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--
+  ═══════════════════════════════════════════════════════════════════
+  STATS — four g-span-3 cells
+  - Position-locked at 12 cols (cols 1/4/7/10 + 3 each)
+  - Wraps cleanly at 8 cols (2 per row), 4 cols (1 per row)
+  ═══════════════════════════════════════════════════════════════════
+-->
+<section class="stats" style="position: relative;">
+  <div class="g-overlay g-overlay--local" aria-hidden="true">
+    <div class="g-overlay__inner" data-overlay></div>
+  </div>
+  <div class="g-row g-row--center" style="position: relative; z-index: 2;">
+    <div class="g-cell g-span-3">
+      <div class="stat-num">12,000+</div>
+      <div class="stat-label">Active teams</div>
+    </div>
+    <div class="g-cell g-span-3">
+      <div class="stat-num">99.99%</div>
+      <div class="stat-label">Uptime, last 12 mo.</div>
+    </div>
+    <div class="g-cell g-span-3">
+      <div class="stat-num">4.9 / 5</div>
+      <div class="stat-label">Avg. user rating</div>
+    </div>
+    <div class="g-cell g-span-3">
+      <div class="stat-num">2.1M</div>
+      <div class="stat-label">Tasks shipped / wk</div>
+    </div>
+  </div>
+</section>
+
+<!--
+  ═══════════════════════════════════════════════════════════════════
+  FEATURES — section header row + 3-column content row
+  - First row: .g-cell.g-full centered heading
+  - Second row: three .g-cell.g-span-4 cells
+  - 2nd and 3rd cells carry .g-sm-hr-top for mobile cell dividers
+  ═══════════════════════════════════════════════════════════════════
+-->
+<section class="features" style="position: relative;">
+  <div class="g-overlay g-overlay--local" aria-hidden="true">
+    <div class="g-overlay__inner" data-overlay></div>
+  </div>
+
+  <div class="g-row" style="position: relative; z-index: 2;">
+    <div class="g-cell g-full" style="text-align: center;">
+      <p class="eyebrow" style="margin-bottom: 12px;">How it works</p>
+      <h2 class="section-title lowercase">three steps, no meetings</h2>
+    </div>
+  </div>
+
+  <div class="g-row g-row--start" style="position: relative; z-index: 2;">
+    <div class="g-cell g-span-4">
+      <div class="feature-num">01</div>
+      <h3 class="feature-title lowercase">plan in minutes</h3>
+      <p class="feature-body">
+        Drag-and-drop boards that adapt to how your team works — sprints,
+        kanban, or a list.
+      </p>
+      <div class="feature-visual">board preview</div>
+    </div>
+
+    <div class="g-cell g-span-4 g-sm-hr-top">
+      <div class="feature-num">02</div>
+      <h3 class="feature-title lowercase">ship without rituals</h3>
+      <p class="feature-body">
+        Async updates, automated standups, and threaded reviews keep
+        momentum without blocking calendars.
+      </p>
+      <div class="feature-visual">sync preview</div>
+    </div>
+
+    <div class="g-cell g-span-4 g-sm-hr-top">
+      <div class="feature-num">03</div>
+      <h3 class="feature-title lowercase">review with context</h3>
+      <p class="feature-body">
+        Every task carries its history — decisions, links, and discussions
+        travel with the work, not in Slack.
+      </p>
+      <div class="feature-visual">review preview</div>
+    </div>
+  </div>
+</section>
+
+<!--
+  ═══════════════════════════════════════════════════════════════════
+  DARK CTA
+  - g-section--dark re-tints grid lines to white/08
+  - g-cell g-full + inner .cta-card centers content at any breakpoint
+  ═══════════════════════════════════════════════════════════════════
+-->
+<section class="g-section--dark cta-section">
+  <div class="g-overlay g-overlay--local" aria-hidden="true">
+    <div class="g-overlay__inner" data-overlay></div>
+  </div>
+
+  <div class="g-row g-row--no-divider" style="position: relative; z-index: 2;">
+    <div class="g-cell g-full" style="text-align: center;">
+      <div class="cta-card">
+        <p class="eyebrow" style="color: rgba(255,255,255,0.4); margin-bottom: 16px;">
+          Ready when you are
+        </p>
+        <h2>Start for free,<br>ship by Friday.</h2>
+        <a href="#" class="btn btn--white">Get started →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--
+  ═══════════════════════════════════════════════════════════════════
+  FOOTER — dark section with 3-column main row + edge-to-edge wordmark + marquee
+  ═══════════════════════════════════════════════════════════════════
+-->
+<footer id="site-footer" class="g-section--dark site-footer">
+  <div class="g-overlay g-overlay--local" aria-hidden="true">
+    <div class="g-overlay__inner" data-overlay></div>
+  </div>
+
+  <!-- Main: brand (6) + product (3) + connect (3) — or three stacked rows on mobile -->
+  <div class="g-row" style="position: relative; z-index: 2;">
+    <div class="g-cell g-span-6 g-sm-full">
+      <div class="footer-brand">
+        <strong style="display: block; font-weight: 800; color: white; letter-spacing: -0.03em; margin-bottom: 8px;">◆ taskflow</strong>
+        A calm, opinionated way for small teams to plan, ship, and review —
+        without the rituals that slow everyone down.
+      </div>
+    </div>
+    <div class="g-cell g-span-3 g-sm-full g-sm-hr-top">
+      <h3>Product</h3>
+      <ul>
+        <li><a href="#">Boards</a></li>
+        <li><a href="#">Async standups</a></li>
+        <li><a href="#">Integrations</a></li>
+        <li><a href="#">Pricing</a></li>
+      </ul>
+    </div>
+    <div class="g-cell g-span-3 g-sm-full g-sm-hr-top">
+      <h3>Connect</h3>
+      <ul>
+        <li><a href="#">Email</a></li>
+        <li><a href="#">LinkedIn</a></li>
+        <li><a href="#">X</a></li>
+        <li><a href="#">RSS</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Edge-to-edge wordmark — --g-inset: 0, no divider -->
+  <div
+    class="g-row g-row--no-divider"
+    style="--g-inset: 0; position: relative; z-index: 2;"
+  >
+    <div class="g-cell g-full">
+      <div class="footer-wordmark">taskflow</div>
+    </div>
+  </div>
+
+  <!-- Marquee — also edge-to-edge -->
+  <div
+    class="g-row g-row--no-divider"
+    style="--g-inset: 0; position: relative; z-index: 2;"
+  >
+    <div class="g-cell g-full" style="padding: 0;">
+      <div class="footer-marquee">
+        <div class="footer-marquee__inner">
+          <span>© 2026 <b>Taskflow Labs</b>. All rights reserved.</span>
+          <span>Structural Grid v1.1</span>
+          <span>Token-driven, responsive, boring on purpose.</span>
+          <span>Made with the candidrender.com system.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Populate every .g-overlay__inner with --g-cols children, re-running
+  // whenever the documentElement resizes (breakpoint change → new --g-cols).
+  const overlays = document.querySelectorAll('[data-overlay]');
+  const paint = () => {
+    const n = parseInt(
+      getComputedStyle(document.documentElement).getPropertyValue('--g-cols'),
+      10
+    ) || 12;
+    overlays.forEach(inner => {
+      if (inner.childElementCount === n) return;
+      inner.replaceChildren();
+      for (let i = 0; i < n; i++) {
+        const c = document.createElement('div');
+        c.className = 'g-overlay__col';
+        inner.appendChild(c);
+      }
+    });
+  };
+  paint();
+  new ResizeObserver(paint).observe(document.documentElement);
+</script>
+</body>
+</html>

@@ -1,0 +1,1278 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════════
+   SCRIPTLEVEL — DESIGN TOKENS
+   Typography and color tuned to DESIGN.md (CandidRender system):
+     • Plus Jakarta Sans 300–800
+     • white / neutral-100 / near-black surface stack
+     • gray-500 / gray-400 supporting text
+     • wordmark red family for the footer flicker
+     • yellow-300 reserved for small assistive-touch accents only
+   ═══════════════════════════════════════════════════════════════════ */
+:root {
+  /* Surfaces */
+  --background: #ffffff;
+  --neutral-50:  #fafafa;
+  --neutral-100: #f5f5f5;
+  --dark-surface: #15151a;
+
+  /* Ink / text */
+  --foreground: #0a0a0a;
+  --gray-900: #171717;
+  --gray-500: #737373;
+  --gray-400: #a3a3a3;
+  --gray-300: #d4d4d4;
+  --gray-200: #e5e5e5;
+  --gray-100: #f5f5f5;
+
+  /* Accents (used sparingly per DESIGN.md) */
+  --yellow-300: #fde047;
+  --yellow-400: #facc15;
+  --emerald-500: #10b981;
+
+  /* Wordmark red family — brighter strokes than DESIGN.md defaults so
+     the outlined wordmark reads distinctly against the dark footer. */
+  --wordmark-red-fill-rest:   #8b1a1a;
+  --wordmark-red-stroke-rest: #c73535;
+  --wordmark-red-fill-lit:    #b52828;
+  --wordmark-red-stroke-lit:  #e25151;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-neutral-50: var(--neutral-50);
+  --color-neutral-100: var(--neutral-100);
+  --color-dark-surface: var(--dark-surface);
+
+  --font-sans: var(--font-plus-jakarta), system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  overflow-anchor: none;
+}
+
+ul, ol { list-style: none; padding: 0; margin: 0; }
+a { color: inherit; text-decoration: none; }
+button { background: transparent; border: 0; color: inherit; cursor: pointer; }
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+  overflow-x: clip;
+}
+
+::selection {
+  background: #e5e5e5;
+  color: #0a0a0a;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   STRUCTURAL GRID SYSTEM v1.1  (sacred — do not modify)
+   ═══════════════════════════════════════════════════════════════════ */
+:root {
+  --g-cols: 12;
+  --g-gap: 24px;
+  --g-pad: 32px;
+  --g-max: 1200px;
+  --g-inset: var(--g-pad);
+  /* Outer vertical rails only — inner column guides are hidden for a
+     cleaner editorial feel. Flip --g-line-soft to a faint value if you
+     ever want the full Tailwind/Vercel interior grid. */
+  --g-line: rgba(10, 10, 10, 0.16);
+  --g-line-soft: transparent;
+  --g-divider: rgba(10, 10, 10, 0.1);
+  --g-row-min: 0;
+}
+
+.g-row {
+  width: 100%;
+  max-width: calc(var(--g-max) + var(--g-pad) * 2);
+  margin-inline: auto;
+  padding-inline: var(--g-pad);
+  display: grid;
+  grid-template-columns: repeat(var(--g-cols), minmax(0, 1fr));
+  gap: var(--g-gap);
+  align-items: stretch;
+  min-height: var(--g-row-min);
+  position: relative;
+  z-index: 1;
+}
+
+.g-row::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -1px;
+  width: calc(100vw - var(--g-sb, 0px));
+  height: 1px;
+  transform: translateX(-50%);
+  background: var(--g-divider);
+  pointer-events: none;
+}
+
+.g-row--center     { align-items: center; }
+.g-row--start      { align-items: start; }
+.g-row--end        { align-items: end; }
+.g-row--no-divider::after { content: none; }
+.g-row--tight      { --g-inset: 0; }
+
+.g-cell {
+  grid-column: var(--g-col, auto);
+  padding: var(--g-inset);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.g-cell > * { max-width: 100%; }
+
+.g-full    { --g-col: 1 / -1; }
+.g-half-l  { --g-col: 1 / span calc(var(--g-cols) / 2); }
+.g-half-r  { --g-col: span calc(var(--g-cols) / 2) / -1; }
+.g-third-l { --g-col: 1 / span calc(var(--g-cols) / 3); }
+.g-third-m { --g-col: span calc(var(--g-cols) / 3) / span calc(var(--g-cols) / 3); }
+.g-third-r { --g-col: span calc(var(--g-cols) / 3) / -1; }
+
+.g-mid-2 { --g-col: calc((var(--g-cols) - 2) / 2 + 1) / span 2; }
+.g-mid-4 { --g-col: calc((var(--g-cols) - 4) / 2 + 1) / span 4; }
+.g-mid-6 { --g-col: calc((var(--g-cols) - 6) / 2 + 1) / span 6; }
+.g-mid-8 { --g-col: calc((var(--g-cols) - 8) / 2 + 1) / span 8; }
+
+.g-span-1  { --g-col: span 1; }
+.g-span-2  { --g-col: span 2; }
+.g-span-3  { --g-col: span 3; }
+.g-span-4  { --g-col: span 4; }
+.g-span-5  { --g-col: span 5; }
+.g-span-6  { --g-col: span 6; }
+.g-span-7  { --g-col: span 7; }
+.g-span-8  { --g-col: span 8; }
+.g-span-9  { --g-col: span 9; }
+.g-span-10 { --g-col: span 10; }
+.g-span-11 { --g-col: span 11; }
+.g-span-12 { --g-col: span 12; }
+
+.g-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+}
+.g-overlay--local { position: absolute; }
+
+.g-overlay__inner {
+  width: 100%;
+  max-width: calc(var(--g-max) + var(--g-pad) * 2);
+  padding-inline: var(--g-pad);
+  display: grid;
+  grid-template-columns: repeat(var(--g-cols), minmax(0, 1fr));
+  gap: var(--g-gap);
+  height: 100%;
+}
+.g-overlay__col { border-inline: 1px solid var(--g-line-soft); }
+.g-overlay__col:first-child { border-inline-start-color: var(--g-line); }
+.g-overlay__col:last-child  { border-inline-end-color:   var(--g-line); }
+
+/* Inside .card-grain (which sets isolation: isolate), the ::before
+   grain overlay sits at z-index: 0. Bump the structural grid overlay
+   ABOVE the grain so lines stay legible on the dark footer surface. */
+.card-grain > .g-overlay { z-index: 1; }
+
+.g-no-overlay .g-overlay, .g-no-overlay .g-overlay--local { display: none; }
+.g-no-dividers .g-row::after { content: none; }
+
+.g-section--dark {
+  --g-line:       rgba(255, 255, 255, 0.14);
+  --g-line-soft:  transparent;
+  --g-divider:    rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 1200px) { :root { --g-cols: 12; } }
+@media (max-width: 1024px) { :root { --g-cols: 8; } }
+@media (max-width: 768px)  { :root { --g-cols: 4; --g-pad: 24px; } }
+@media (max-width: 480px)  { :root { --g-cols: 2; --g-pad: 16px; --g-gap: 12px; } }
+
+@media (max-width: 768px) {
+  .g-sm-full { --g-col: 1 / -1; }
+  .g-sm-hr-top { position: relative; }
+  .g-sm-hr-top::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    width: calc(100vw - var(--g-sb, 0px));
+    height: 1px;
+    transform: translateX(-50%);
+    background: var(--g-divider);
+    pointer-events: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TYPOGRAPHY — Plus Jakarta Sans at varied weights/tracking.
+   Lowercase headings are the brand default (DESIGN.md §Typography).
+   ═══════════════════════════════════════════════════════════════════ */
+.type-display {
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 0.98;
+  color: var(--foreground);
+}
+
+.type-heading {
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+  color: var(--foreground);
+}
+
+.type-body {
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--gray-500);
+  font-weight: 400;
+}
+
+.type-mono {
+  font-family: var(--font-mono);
+  font-feature-settings: "ss01", "zero";
+  letter-spacing: 0.01em;
+}
+
+/* Eyebrow / micro-label — Plus Jakarta, lowercase (brief), semibold,
+   tracked-out, gray-400. Dash prefix preserves the editorial feel. */
+.micro-label {
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: lowercase;
+  color: var(--gray-400);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+}
+
+.micro-label::before {
+  content: "";
+  width: 28px;
+  height: 1px;
+  background: var(--gray-300);
+  display: inline-block;
+}
+
+/* Mode sigils — Plus Jakarta weight matched to context */
+.sigil {
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-weight: 500;
+  display: inline-block;
+  color: var(--foreground);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SECTION RHYTHM
+   ═══════════════════════════════════════════════════════════════════ */
+.section-rhythm        { padding-block: clamp(72px, 12vh, 144px); }
+.section-rhythm--tight { padding-block: clamp(48px, 8vh,  96px); }
+.section-rhythm--loose { padding-block: clamp(96px, 18vh, 200px); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   SCROLL-REVEAL — subtle fade-up on section enter.
+   ═══════════════════════════════════════════════════════════════════ */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-d1 { transition-delay: 0.05s; }
+.reveal-d2 { transition-delay: 0.12s; }
+.reveal-d3 { transition-delay: 0.19s; }
+.reveal-d4 { transition-delay: 0.26s; }
+.reveal-d5 { transition-delay: 0.33s; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   CARD GRAIN — SVG fractalNoise. Per SKILL.md, only on tinted / dark
+   surfaces. On pure white this reads as dirt, so .card-grain is only
+   applied to neutral-100 surfaces and the dark footer.
+   ═══════════════════════════════════════════════════════════════════ */
+.card-grain {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.card-grain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.3;
+  mix-blend-mode: multiply;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='a' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)'/%3E%3C/svg%3E");
+  background-size: 180px;
+}
+/* Lift real content above the grain ::before. EXCLUDE .g-overlay —
+   the overlay relies on `.g-overlay--local { position: absolute }` +
+   `inset: 0` to stretch to the parent's bounds; forcing it to
+   position: relative collapses it to zero height. */
+.card-grain > :not(.g-overlay) { position: relative; z-index: 1; }
+
+.card-grain--soft::before { opacity: 0.2; }
+
+.card-grain--dark::before {
+  opacity: 0.55;
+  mix-blend-mode: overlay;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='a' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)' opacity='0.55'/%3E%3C/svg%3E");
+  background-size: 220px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   BUTTONS — two 3D pill variants, both matching DESIGN.md §6a:
+     .cta-primary     BLACK pill: hero + final CTA (per §Color:
+                      "black→gray-900 gradient")
+     .cta-pill-3d     WHITE pill with gray text (per §6a recipe exactly):
+                      for nav + smaller CTAs
+   Both use the three-shadow stack (outer drop + tight drop + inset
+   highlight), scale-on-hover, press-sink.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.cta-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 22px;
+  background: linear-gradient(to bottom, var(--gray-900) 0%, #050505 100%);
+  color: #ffffff;
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition:
+    transform 0.15s ease-out,
+    box-shadow 0.15s ease-out,
+    background 0.2s;
+  /* Three-shadow stack: outer drop + tight drop + inset highlight */
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.22),
+    0 2px 4px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.35);
+}
+.cta-primary:hover {
+  transform: scale(1.03);
+  background: linear-gradient(to bottom, #262626 0%, #0a0a0a 100%);
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.28),
+    0 3px 6px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.35);
+}
+.cta-primary:active {
+  transform: translateY(1px) scale(0.97);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.18),
+    inset 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* White 3D pill — ports DESIGN.md §6a Pill3DButton exactly.
+   Used as the nav CTA ("open scriptlevel") and any smaller action
+   button on light surfaces. */
+.cta-pill-3d {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: #ffffff;
+  color: var(--gray-500);
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition:
+    transform 0.15s ease-out,
+    box-shadow 0.15s ease-out,
+    color 0.2s;
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.12),
+    0 2px 4px rgba(0, 0, 0, 0.08),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.05);
+}
+.cta-pill-3d:hover {
+  transform: scale(1.05);
+  color: var(--foreground);
+}
+.cta-pill-3d:active {
+  transform: translateY(1px) scale(0.95);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Secondary CTA — text with underline, neutral tone */
+.cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 0;
+  color: var(--foreground);
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  border-bottom: 1px solid var(--gray-300);
+  transition: border-color 0.2s, color 0.2s;
+}
+.cta-secondary:hover { border-color: var(--foreground); }
+
+/* Nav link — Plus Jakarta, lowercase, xs semibold, gray-500 */
+.nav-link {
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--gray-500);
+  transition: color 0.2s;
+  text-transform: lowercase;
+  white-space: nowrap;
+}
+.nav-link:hover { color: var(--foreground); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   SITE HEADER — sticky nav: brand left, actions right, one line at
+   every breakpoint. Uses a single full-width cell with inline flex
+   (NOT g-half-l/g-half-r) so the actions group can take more space
+   than the brand without the cells colliding.
+   ═══════════════════════════════════════════════════════════════════ */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: transparent;
+  transition: background 0.3s ease, border-color 0.3s ease,
+              opacity 0.3s ease, transform 0.3s ease;
+}
+.site-header.is-scrolled {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(10, 10, 10, 0.06);
+}
+.site-header.is-hidden {
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+}
+
+/* Single nav row — flex row, brand on one end, actions on the other.
+   Overrides .g-cell's default flex-direction: column. */
+.site-header__row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(20px, 3vw, 40px);
+  min-width: 0;
+}
+
+.site-header__brand {
+  display: inline-flex;
+  align-items: center;
+  color: var(--foreground);
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-kerning: normal;
+  font-feature-settings: "kern" 1;
+  text-rendering: optimizeLegibility;
+}
+
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.5vw, 28px);
+  min-width: 0;
+}
+
+.site-header__links {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.2vw, 26px);
+  min-width: 0;
+}
+@media (max-width: 720px) {
+  .site-header__links { display: none; }
+}
+
+.site-header__cta {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.site-header__cta-label { display: inline-block; }
+@media (max-width: 420px) {
+  .site-header__cta-label { display: none; }
+  .site-header__cta { padding: 8px 12px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MODE CARDS — white base, clean hairline border, soft depth, desktop
+   hover lift. Inner elements aligned on a consistent vertical rhythm.
+   ═══════════════════════════════════════════════════════════════════ */
+.mode-card {
+  background: var(--background);
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: clamp(24px, 3vw, 34px);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  position: relative;
+  min-height: 220px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 3px 10px -6px rgba(0, 0, 0, 0.06);
+  transition:
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s;
+}
+@media (min-width: 768px) {
+  .mode-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--gray-300);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 1) inset,
+      0 18px 38px -18px rgba(0, 0, 0, 0.2),
+      0 5px 12px -6px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.mode-card__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--gray-200);
+}
+.mode-card__glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--neutral-100);
+  color: var(--foreground);
+}
+.mode-card__label {
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: lowercase;
+  color: var(--gray-500);
+}
+.mode-card__headline {
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-size: clamp(1.25rem, 1.9vw, 1.625rem);
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.015em;
+  color: var(--foreground);
+  margin-top: -4px;
+}
+.mode-card__body {
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--gray-500);
+  max-width: 44ch;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   FIVE-MODES BENTO — a padded container INSIDE the grid rails. Cards
+   pack tightly (16px gap) with uniform var(--g-pad) inset from each of
+   the four rails. 2-col desktop/tablet, 1-col mobile, 5th card spans
+   both columns as a full-width row.
+   ═══════════════════════════════════════════════════════════════════ */
+.bento {
+  padding: var(--g-pad);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.bento__slot {
+  display: block;
+  min-width: 0;
+}
+.bento__slot--full {
+  grid-column: 1 / -1;
+}
+@media (max-width: 640px) {
+  .bento { grid-template-columns: 1fr; gap: 12px; }
+  .bento__slot--full { grid-column: auto; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SHOT BLOCKS — divided by hairlines. Two-column at desktop (sigil/label
+   left, body right), stacks to one column on mobile.
+   ═══════════════════════════════════════════════════════════════════ */
+.shot-block {
+  padding: clamp(32px, 5vh, 56px) 0;
+  border-top: 1px solid var(--gray-200);
+  display: grid;
+  grid-template-columns: minmax(140px, 220px) 1fr;
+  gap: clamp(24px, 4vw, 56px);
+  align-items: start;
+}
+.shot-block:first-of-type { border-top: 0; }
+@media (max-width: 640px) {
+  .shot-block {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+.shot-block__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.shot-block__glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--background);
+  border: 1px solid var(--gray-200);
+  color: var(--foreground);
+}
+.shot-block__label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: lowercase;
+  color: var(--gray-500);
+}
+.shot-block__body {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--foreground);
+  max-width: 60ch;
+}
+
+/* Pull quote — italic, centered, gray-500, generous padding */
+.pull-quote {
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.25rem, 2vw, 1.625rem);
+  line-height: 1.45;
+  color: var(--gray-500);
+  text-align: center;
+  padding-block: clamp(32px, 5vh, 56px);
+  letter-spacing: -0.005em;
+}
+
+/* Status pill — mono, inline at the end of a list item */
+.status-pill {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--gray-300);
+  color: var(--gray-500);
+  white-space: nowrap;
+}
+.status-pill--shipped {
+  color: #0f5132;
+  border-color: rgba(15, 81, 50, 0.3);
+  background: rgba(16, 185, 129, 0.06);
+}
+.status-pill--porting {
+  color: var(--gray-500);
+  border-color: var(--gray-300);
+  background: var(--neutral-50);
+}
+.status-pill--forthcoming {
+  color: var(--wordmark-red-fill-rest);
+  border-color: rgba(139, 26, 26, 0.3);
+  background: rgba(139, 26, 26, 0.04);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   DASH-PREFIX LIST — editorial row: hairline dash + text + optional
+   status pill, all aligned on a consistent grid track.
+   ═══════════════════════════════════════════════════════════════════ */
+.dash-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.dash-list > li {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  column-gap: 20px;
+  align-items: start;
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--gray-500);
+  padding-block: 20px;
+  border-bottom: 1px solid var(--gray-200);
+}
+.dash-list > li:first-child { padding-top: 0; }
+.dash-list > li:last-child { border-bottom: 0; padding-bottom: 0; }
+
+/* First span acts as the hairline dash marker — matches the micro-label
+   dash so the vertical rhythm of the page feels unified. */
+.dash-list > li > span:first-child {
+  display: block;
+  width: 18px;
+  height: 1px;
+  background: var(--gray-300);
+  margin-top: 0.85em;
+}
+
+/* Text span — first line aligns to the dash; strong copy uses foreground ink */
+.dash-list > li > span:nth-child(2) {
+  color: var(--foreground);
+}
+
+/* Status pill — vertically centered on first line of text */
+.dash-list .status-pill {
+  margin-top: 0.15em;
+  justify-self: end;
+  align-self: start;
+}
+
+.dash-list strong {
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+/* Mobile: pill drops beneath the text so long labels don't squeeze */
+@media (max-width: 640px) {
+  .dash-list > li {
+    grid-template-columns: 28px minmax(0, 1fr);
+    row-gap: 10px;
+  }
+  .dash-list .status-pill {
+    grid-column: 2 / -1;
+    justify-self: start;
+    margin-top: 0;
+  }
+}
+
+/* Sigil strip — horizontal run below the hero */
+.sigil-strip {
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  letter-spacing: 0.01em;
+  color: var(--gray-500);
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  align-items: center;
+  text-transform: lowercase;
+  font-weight: 500;
+}
+.sigil-strip .sigil { color: var(--foreground); margin-right: 6px; font-weight: 500; }
+
+/* FAQ pair — full-viewport-width dividers via absolute-positioned pseudos
+   (matches the .g-row::after mechanism so lines align with every other
+   grid divider on the page). */
+.faq-pair {
+  position: relative;
+  padding-block: clamp(24px, 4vh, 36px);
+}
+.faq-pair::before,
+.faq-pair:last-child::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: calc(100vw - var(--g-sb, 0px));
+  height: 1px;
+  transform: translateX(-50%);
+  background: var(--gray-200);
+  pointer-events: none;
+}
+.faq-pair::before { top: 0; }
+.faq-pair:last-child::after { bottom: 0; }
+
+/* Render-progress pill (decorative inside shot narrative) */
+.render-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: var(--foreground);
+  color: var(--background);
+  letter-spacing: 0.02em;
+}
+.render-pill::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--wordmark-red-fill-lit);
+  animation: render-blink 1.8s ease-in-out infinite;
+}
+@keyframes render-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PROJECT TREE DIAGRAM — file-explorer style, hierarchical rows with
+   tree connectors. Workspace → project → 5 mode lenses → object track.
+   Readable, editorial, tech-literate.
+   ═══════════════════════════════════════════════════════════════════ */
+.tree {
+  background: var(--background);
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: clamp(22px, 3vw, 36px) clamp(22px, 3vw, 36px) clamp(26px, 3.2vw, 40px);
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.02),
+    0 3px 10px -6px rgba(0, 0, 0, 0.05);
+}
+
+.tree__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9375rem;
+  line-height: 2.1;
+  color: var(--foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tree__branch {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  color: var(--gray-400);
+  font-size: 0.875rem;
+  flex-shrink: 0;
+  white-space: pre;
+}
+
+.tree__kind {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: lowercase;
+  color: var(--gray-400);
+  padding: 2px 8px;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  background: var(--neutral-50);
+}
+
+.tree__label {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--foreground);
+}
+
+.tree__hint {
+  color: var(--gray-500);
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.tree__objs {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.tree__icon {
+  color: var(--foreground);
+  flex-shrink: 0;
+}
+
+.tree__row--root {
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+}
+.tree__row--child {
+  padding-bottom: 10px;
+  margin-bottom: 8px;
+  border-bottom: 1px dashed var(--gray-200);
+}
+
+@media (max-width: 640px) {
+  .tree {
+    padding: 20px 16px 24px;
+    border-radius: 8px;
+  }
+  .tree__row {
+    white-space: normal;
+    line-height: 1.55;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    font-size: 0.875rem;
+  }
+  .tree__kind { font-size: 0.625rem; padding: 1px 6px; }
+  .tree__hint { font-size: 0.8125rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   DISCIPLINE LIST — six-item vertical list with consistent rhythm,
+   strong term + supporting clause per line. Replaces the old dash-list
+   on the production-discipline section for tighter, calmer spacing.
+   ═══════════════════════════════════════════════════════════════════ */
+.discipline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 40px;
+  border-top: 1px solid var(--gray-200);
+}
+.discipline-list > li {
+  position: relative;
+  padding: 20px 0 20px 32px;
+  border-bottom: 1px solid var(--gray-200);
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--gray-500);
+}
+.discipline-list > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 1.1em;
+  width: 18px;
+  height: 1px;
+  background: var(--gray-300);
+}
+.discipline-list strong {
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   (Legacy .pd — retained for any stragglers; no longer referenced on home)
+   ═══════════════════════════════════════════════════════════════════ */
+.pd { position: relative; display: block; }
+
+.pd-frame {
+  position: relative;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  padding: clamp(28px, 4vw, 44px) clamp(22px, 3.5vw, 36px) clamp(24px, 3.5vw, 32px);
+  background: var(--background);
+}
+.pd-frame--inner {
+  background: var(--neutral-100);
+  padding-top: clamp(32px, 4vw, 48px);
+}
+.pd-frame__label {
+  position: absolute;
+  top: 0;
+  left: clamp(16px, 3vw, 28px);
+  transform: translateY(-50%);
+  padding: 0 10px;
+  background: var(--neutral-50);
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: lowercase;
+  color: var(--gray-500);
+}
+.pd-frame--inner .pd-frame__label { background: var(--background); }
+
+.pd-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  margin-bottom: clamp(24px, 4vw, 36px);
+}
+.pd-pill {
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+  padding: 5px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: 999px;
+  color: var(--gray-500);
+  background: var(--background);
+}
+.pd-pill--current {
+  background: var(--foreground);
+  color: var(--background);
+  border-color: var(--foreground);
+}
+
+.pd-project-title {
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.125rem, 1.9vw, 1.5rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+  margin-bottom: clamp(22px, 3.5vw, 32px);
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.pd-project-title__kind {
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  color: var(--gray-500);
+}
+
+.pd-modes {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: clamp(22px, 3.5vw, 32px);
+}
+@media (max-width: 700px) { .pd-modes { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 420px) { .pd-modes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.pd-mode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 8px 12px;
+  background: var(--background);
+  border: 1px solid var(--gray-200);
+  border-radius: 6px;
+  text-align: center;
+}
+.pd-mode__sigil {
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 1.375rem;
+  line-height: 1;
+  color: var(--foreground);
+}
+.pd-mode__label {
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+  color: var(--gray-500);
+}
+
+.pd-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  padding-top: clamp(16px, 2.5vw, 22px);
+  border-top: 1px dashed var(--gray-300);
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  letter-spacing: 0.01em;
+  color: var(--gray-500);
+  font-weight: 500;
+}
+.pd-flow__step {
+  padding: 4px 10px;
+  background: var(--background);
+  border: 1px solid var(--gray-200);
+  border-radius: 6px;
+  text-transform: lowercase;
+}
+.pd-flow__arrow {
+  color: var(--gray-400);
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+}
+
+/* Grain retune on inner project frame — neutral-100 takes light grain */
+.pd-frame--inner.card-grain::before { opacity: 0.2; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   FOOTER — dark surface, gray tokens retinted
+   ═══════════════════════════════════════════════════════════════════ */
+.site-footer {
+  background: var(--dark-surface);
+  color: rgba(255, 255, 255, 0.7);
+}
+.site-footer a { color: rgba(255, 255, 255, 0.7); transition: color 0.2s; }
+.site-footer a:hover { color: #ffffff; }
+.site-footer-head {
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: lowercase;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 18px;
+}
+.site-footer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-size: 0.9375rem;
+}
+
+/* Wordmark cell — flush to grid rails on all four sides. The SVG fills
+   width: 100% and scales proportionally via preserveAspectRatio, so
+   height follows naturally. */
+.site-footer-wordmark {
+  padding: 0 !important;
+}
+.site-footer-wordmark svg {
+  display: block;
+  width: 100%;
+  /* Kerning and optical adjustments — Plus Jakarta's kern table pairs
+     plus ligatures and contextual alternates. `optimizeLegibility`
+     tells the browser to prefer quality over speed for large text. */
+  font-kerning: normal;
+  font-feature-settings: "kern" 1, "calt" 1, "liga" 1;
+  text-rendering: optimizeLegibility;
+  font-optical-sizing: auto;
+}
+
+/* Footer column placement — reflows automatically via --g-cols:
+     12 cols → span 3 → 4 per row
+     8  cols → span 4 → 2 per row (tablet)
+     4  cols → span 2 → 2 per row (mobile)
+     2  cols → full   → 1 per row (small phone) */
+.footer-col {
+  grid-column: span 3;
+}
+@media (max-width: 1024px) { .footer-col { grid-column: span 4; } }
+@media (max-width: 768px)  { .footer-col { grid-column: span 2; } }
+@media (max-width: 480px)  { .footer-col { grid-column: 1 / -1; } }
+
+/* ═══════════════════════════════════════════════════════════════════
+   WORDMARK FLICKER — red family per DESIGN.md
+   ═══════════════════════════════════════════════════════════════════ */
+@keyframes wordmark-flicker {
+  0%, 40%  { fill: var(--wordmark-red-fill-rest); stroke: var(--wordmark-red-stroke-rest); }
+  42%      { fill: var(--wordmark-red-fill-lit);  stroke: var(--wordmark-red-stroke-lit); }
+  45%      { fill: var(--wordmark-red-fill-rest); stroke: var(--wordmark-red-stroke-rest); }
+  58%      { fill: var(--wordmark-red-fill-rest); stroke: var(--wordmark-red-stroke-rest); }
+  60%      { fill: var(--wordmark-red-fill-lit);  stroke: var(--wordmark-red-stroke-lit); }
+  61%      { fill: var(--wordmark-red-fill-rest); stroke: var(--wordmark-red-stroke-rest); }
+  63%      { fill: var(--wordmark-red-fill-lit);  stroke: var(--wordmark-red-stroke-lit); }
+  67%      { fill: var(--wordmark-red-fill-rest); stroke: var(--wordmark-red-stroke-rest); }
+  79%      { fill: var(--wordmark-red-fill-rest); stroke: var(--wordmark-red-stroke-rest); }
+  81%      { fill: var(--wordmark-red-fill-lit);  stroke: var(--wordmark-red-stroke-lit); }
+  83%      { fill: var(--wordmark-red-fill-rest); stroke: var(--wordmark-red-stroke-rest); }
+  100%     { fill: var(--wordmark-red-fill-rest); stroke: var(--wordmark-red-stroke-rest); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   FOOTER MARQUEE — masked edges, continuous loop
+   ═══════════════════════════════════════════════════════════════════ */
+@keyframes marquee-x {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.footer-marquee {
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+          mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  padding-block: 14px;
+}
+.footer-marquee__track {
+  display: inline-flex;
+  align-items: center;
+  gap: 28px;
+  animation: marquee-x 48s linear infinite;
+  will-change: transform;
+  padding-right: 28px;
+}
+.footer-marquee__track > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: lowercase;
+  color: rgba(255, 255, 255, 0.45);
+  flex-shrink: 0;
+}
+.footer-marquee__track .sigil {
+  color: var(--wordmark-red-fill-rest);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   HERO BREATHING DASH — horizontal short dash with a subtle vertical
+   breath + opacity pulse. Softer than a bouncing arrow; suggests
+   "there's more below" without shouting.
+   ═══════════════════════════════════════════════════════════════════ */
+@keyframes hero-dash {
+  0%, 100% { transform: translateY(0);  opacity: 0.45; }
+  50%      { transform: translateY(4px); opacity: 1; }
+}
+.hero-dash {
+  display: block;
+  width: 36px;
+  height: 1px;
+  margin: 0 auto;
+  background: var(--foreground);
+  animation: hero-dash 2s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Fade-up utility */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
