@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-const SITE_URL = 'https://scriptlevel.com';
+const SITE_URL = 'https://www.scriptlevel.com';
 
 /**
  * robots.txt — emitted by Next's built-in Metadata Routes API.

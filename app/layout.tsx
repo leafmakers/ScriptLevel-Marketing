@@ -16,7 +16,7 @@ const plusJakarta = Plus_Jakarta_Sans({
    picks up the change. The canonical URL is the brand domain (not the
    Vercel alias) so once the domain is wired, nothing else needs to move.
    ═══════════════════════════════════════════════════════════════════ */
-const SITE_URL = 'https://scriptlevel.com';
+const SITE_URL = 'https://www.scriptlevel.com';
 const SITE_NAME = 'scriptlevel';
 const SITE_TAGLINE = 'five modes, one project';
 const SITE_DESCRIPTION =

@@ -159,7 +159,7 @@ const HEADING_STYLE: React.CSSProperties = {
 const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  '@id': 'https://scriptlevel.com/#faq',
+  '@id': 'https://www.scriptlevel.com/#faq',
   mainEntity: FAQS.map((item) => ({
     '@type': 'Question',
     name: item.q,
@@ -615,7 +615,7 @@ export default function Home() {
             </Reveal>
             <Reveal delay={2}>
               <div className="mt-10">
-                <a href="https://scriptlevel.com/app" className="cta-primary">
+                <a href="https://www.scriptlevel.com/app" className="cta-primary">
                   open scriptlevel
                   <Icon name="arrow_outward" size={14} />
                 </a>

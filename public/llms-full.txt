@@ -104,8 +104,8 @@ Free through v0.1. Paid plans when the remaining modes ship.
 
 ## Links
 
-- Home: https://scriptlevel.com
-- Updates (ship-state): https://scriptlevel.com/updates
-- Five modes: https://scriptlevel.com/#five-modes
-- FAQ: https://scriptlevel.com/#faq
+- Home: https://www.scriptlevel.com
+- Updates (ship-state): https://www.scriptlevel.com/updates
+- Five modes: https://www.scriptlevel.com/#five-modes
+- FAQ: https://www.scriptlevel.com/#faq
 - candidrender (sibling product): https://candidrender.com

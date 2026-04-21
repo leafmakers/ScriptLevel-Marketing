@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     title: 'scriptlevel updates · v0.1',
     description:
       'What ships today, what is designed and porting, what is still forthcoming.',
-    url: 'https://scriptlevel.com/updates',
+    url: 'https://www.scriptlevel.com/updates',
     type: 'article',
   },
   twitter: {
@@ -34,13 +34,13 @@ const breadcrumbJsonLd = {
       '@type': 'ListItem',
       position: 1,
       name: 'scriptlevel',
-      item: 'https://scriptlevel.com',
+      item: 'https://www.scriptlevel.com',
     },
     {
       '@type': 'ListItem',
       position: 2,
       name: 'updates',
-      item: 'https://scriptlevel.com/updates',
+      item: 'https://www.scriptlevel.com/updates',
     },
   ],
 };

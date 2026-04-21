@@ -35,8 +35,8 @@ Generation tools give you clips. scriptlevel gives you a project — with the di
 
 ## Pages
 
-- [Home](https://scriptlevel.com/): Hero, problem framing, one-shot narrative, five-modes bento, project tree, production discipline, who it's for, FAQ, final CTA.
-- [Updates](https://scriptlevel.com/updates): Honest ship-state list with per-item status.
+- [Home](https://www.scriptlevel.com/): Hero, problem framing, one-shot narrative, five-modes bento, project tree, production discipline, who it's for, FAQ, final CTA.
+- [Updates](https://www.scriptlevel.com/updates): Honest ship-state list with per-item status.
 
 ## Organization
 
