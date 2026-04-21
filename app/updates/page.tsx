@@ -5,9 +5,44 @@ import Reveal from '@/components/Reveal';
 import Icon from '@/components/Icon';
 
 export const metadata: Metadata = {
-  title: 'scriptlevel — updates · v0.1',
+  title: 'updates · v0.1 — honest about ship state',
   description:
-    'Honest about ship state. What ships today, what is designed and porting, what is forthcoming.',
+    'Honest about ship state. What ships today, what is designed and porting, what is forthcoming in scriptlevel — the AI filmmaking tool from Made by Wind.',
+  alternates: { canonical: '/updates' },
+  openGraph: {
+    title: 'scriptlevel updates · v0.1',
+    description:
+      'What ships today, what is designed and porting, what is still forthcoming.',
+    url: 'https://scriptlevel.com/updates',
+    type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'scriptlevel updates · v0.1',
+    description:
+      'Honest about ship state. What ships today, designed and porting, forthcoming.',
+  },
+};
+
+/* BreadcrumbList JSON-LD — helps Google and AI engines place /updates
+   within the site hierarchy (home → updates). */
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'scriptlevel',
+      item: 'https://scriptlevel.com',
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: 'updates',
+      item: 'https://scriptlevel.com/updates',
+    },
+  ],
 };
 
 const MODE_ICONS = {
@@ -36,6 +71,10 @@ const TODAY: {
 export default function Updates() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* ─── Page header ─────────────────────────────────────────── */}
       <section className="relative">
         <GridOverlay />

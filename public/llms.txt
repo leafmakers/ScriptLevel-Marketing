@@ -1,0 +1,46 @@
+# scriptlevel
+
+> An AI filmmaking tool from words to final cut. Five modes. One project. A browser-based suite from Made by Wind that unifies screenplay, storyboard, voice, timeline, and render into a single project tree, so a short film is carried as one object instead of a file handed between tools.
+
+scriptlevel is built for directors and small teams making short-form video — explainers, ads, music videos, short films, documentaries under five minutes — who have been juggling four tools and losing a shot's worth of context at every handoff.
+
+## The five modes
+
+Each mode is a lens on the same project tree, not a separate document or app.
+
+- **develop** — screenplay editor with shot division. Produces scenes and shots.
+- **visualize** — storyboard and style lab. Generates frame variants, locks a look, uses a seed for consistency.
+- **perform** — voice cards with takes. Six voices, six waveforms. Pick, blend, or record.
+- **assemble** — timeline and program monitor. Tracks, playhead, scrubber.
+- **deliver** — render queue and exports gallery. Comment-able review links.
+
+## Status (v0.1)
+
+Free through v0.1. Paid plans when the remaining modes ship.
+
+- Shipped: home dashboard, multi-workspace, project grid, develop mode (screenplay editor + shot division).
+- Designed and porting: visualize, perform, assemble, deliver.
+- Forthcoming: AI generation wiring to models, accounts, cloud sync, collaboration.
+
+## Production discipline
+
+Generation tools give you clips. scriptlevel gives you a project — with the discipline that short-form production actually runs on:
+
+- Screenplay format as a first-class document, not a workaround.
+- Shot codes, lenses, durations, statuses — the metadata of real production.
+- Versions on every shot, every frame, every take.
+- Render queue with explicit progress and retry.
+- Review with comment-able links and time-pinned threads.
+- Model-agnostic routing, per shot (forthcoming).
+
+## Pages
+
+- [Home](https://scriptlevel.com/): Hero, problem framing, one-shot narrative, five-modes bento, project tree, production discipline, who it's for, FAQ, final CTA.
+- [Updates](https://scriptlevel.com/updates): Honest ship-state list with per-item status.
+
+## Organization
+
+- Publisher: Made by Wind (https://madebywind.com)
+- Studio behind: candidrender (AI architectural visualization)
+- Also from MBW: object guide, shape draft, album os
+- Social: @MadebyWind on X, Instagram, Threads, LinkedIn

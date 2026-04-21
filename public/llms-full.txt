@@ -1,0 +1,111 @@
+# scriptlevel — full content
+
+> An AI filmmaking tool from words to final cut. This file is the
+> full-content variant of llms.txt, intended for LLM ingestion with
+> more complete context than the summary in /llms.txt.
+
+## Product summary
+
+scriptlevel is a browser-based AI filmmaking tool from Made by Wind (the studio behind candidrender). It unifies five production stages — script, storyboard, voice, timeline, render — into a single project tree. A short film is carried as one object, not a file handed between tools.
+
+The problem it addresses: making a short film with AI today is a stack of open tabs. A script doc. A generation tool. A voice tool. A timeline. A review link. Context drops at every boundary. Consistency — of character, of style, of voice — is the work, and the tools aren't built for it.
+
+scriptlevel's answer: one workspace, one project, five lenses on the same project tree. Each mode (develop, visualize, perform, assemble, deliver) is a view on the same underlying objects — not a separate document, not a separate app.
+
+## The five modes, in detail
+
+### develop
+Screenplay paper with an outline rail. You write a slug line, an action, a line. Every shot block highlights its beats. Each beat collapses into a card in Shots with a type (for example MACRO), a duration (3.1s), a lens (100mm), and a status dot. Produces: scenes, shots.
+
+### visualize
+Frames first, style second. Shot cards flow into the storyboard. Generate four frame variants per shot. Lock a style (for example "Ed-Ruscha-ish"). A seed (for example 0x7A3F91) anchors consistency across every subsequent frame. Produces: frames.
+
+### perform
+Voices with takes. Six voice cards, six waveforms. Record two takes of a line. Pick one, or blend them. The line stays anchored to its shot. Produces: voices.
+
+### assemble
+The timeline is the film. The shot, its locked frames, and the chosen voice take land on a timeline with tracks, a playhead, and a scrubber. Nudge timing. The shots locked upstream are already there. Produces: clips.
+
+### deliver
+Render, share, review. The render queue respects your plan. A pill at the top of the screen reads a live percentage (for example 42%). When it's done, a comment-able link drops into your exports gallery. Produces: renders.
+
+## Who scriptlevel is for
+
+Directors and small teams making short-form AI-assisted work. Specifically:
+
+- Explainer video teams
+- Advertising creatives
+- Music video directors
+- Short-film makers
+- Documentary producers
+
+The common denominator: anyone making a film under five minutes who has been juggling four tools and losing a shot's worth of context at every handoff.
+
+## Why scriptlevel is not "another generation tool"
+
+Generation tools give you clips. scriptlevel gives you a project with the discipline short-form production actually runs on:
+
+- **Screenplay format** as a first-class document, not a workaround.
+- **Shot codes**, lenses, durations, statuses — the metadata of real production.
+- **Versions** on every shot, every frame, every take.
+- **Render queue** with explicit progress and retry.
+- **Review** with comment-able links, time-pinned threads.
+- **Model-agnostic** routing per shot — route each shot to the model that fits (forthcoming).
+
+## Ship state (v0.1)
+
+Honest about what's here today and what's not:
+
+| Item | Status |
+| --- | --- |
+| Home dashboard with multi-workspace and project grid | shipped |
+| develop — screenplay editor and shot division | shipped |
+| visualize — storyboard and style lab | designed, porting |
+| perform — voice cards and take comparison | designed, porting |
+| assemble — timeline and program monitor | designed, porting |
+| deliver — render queue and exports gallery | designed, porting |
+| AI generation wiring to models | forthcoming |
+| Accounts, cloud sync, collaboration | forthcoming |
+
+The shape is built. The modes are designed. The wiring is what's next.
+
+## Frequently asked questions
+
+**Who is this for?**
+Directors and small teams making short-form AI-assisted films — explainers, ads, music videos, short films, documentaries.
+
+**What's here today?**
+The home dashboard, multi-workspace, project creation, and Develop mode. The other four modes are designed and porting.
+
+**Does it generate video?**
+Not yet. The UI is built around generation; model wiring is next.
+
+**Which models will it use?**
+Model-agnostic routing, per shot. Specifics will be announced when the wiring lands.
+
+**Does it replace my editor?**
+It gets shots onto a timeline. For heavy finishing, you'll still open Premiere or Resolve.
+
+**Is it collaborative?**
+The shape is built for it; real-time is not yet wired.
+
+**Is my work safe?**
+v0.1 persists to your browser's localStorage. Cloud persistence and accounts are next.
+
+**What will it cost?**
+Free through v0.1. Paid plans when the remaining modes ship.
+
+## Organization
+
+- **Publisher**: Made by Wind (https://madebywind.com)
+- **Studio**: The team behind candidrender (AI architectural visualization)
+- **Other products from Made by Wind**: object guide, shape draft, album os
+- **Social**: @MadebyWind on X, Instagram, Threads, LinkedIn
+
+## Links
+
+- Home: https://scriptlevel.com
+- Updates (ship-state): https://scriptlevel.com/updates
+- Five modes: https://scriptlevel.com/#five-modes
+- FAQ: https://scriptlevel.com/#faq
+- candidrender (sibling product): https://candidrender.com

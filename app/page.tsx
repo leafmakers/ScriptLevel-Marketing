@@ -109,6 +109,8 @@ const SHOT_BLOCKS: { icon: ModeIcon; name: string; body: React.ReactNode }[] = [
   },
 ];
 
+/* FAQ entries — rendered as visible JSX AND emitted as JSON-LD
+   FAQPage schema below for rich results + AI answer ingestion. */
 const FAQS: { q: string; a: string }[] = [
   {
     q: 'Who is this for?',
@@ -152,9 +154,33 @@ const HEADING_STYLE: React.CSSProperties = {
   letterSpacing: '-0.02em',
 };
 
+/* FAQPage JSON-LD — shipped once to Google + answer engines.
+   Keeps the visible copy as the source of truth. */
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  '@id': 'https://scriptlevel.com/#faq',
+  mainEntity: FAQS.map((item) => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.a,
+    },
+  })),
+};
+
 export default function Home() {
   return (
     <>
+      {/* FAQPage JSON-LD — emitted into the same document as the FAQ
+          section so Google and AI engines can verify the visible copy
+          matches the structured data. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+
       {/* ═══════════════ 1 — HERO ═══════════════ */}
       <section id="hero" className="relative">
         <GridOverlay />
