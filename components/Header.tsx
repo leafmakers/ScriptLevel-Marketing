@@ -64,10 +64,10 @@ export default function Header() {
                   </li>
                 ))}
               </ul>
-              <a href="/#open" className="cta-pill-3d site-header__cta">
+              <Link href="/#open" className="cta-pill-3d site-header__cta">
                 <span className="site-header__cta-label">launch</span>
                 <Icon name="arrow_outward" size={13} />
-              </a>
+              </Link>
             </div>
           </div>
         </div>
